@@ -1,0 +1,13 @@
+# Cloudflare Pages + D1 config for Santa's List.
+# Set Pages "Root directory" to `secret-santa` in the dashboard.
+# After creating a D1 database, replace database_id below with the real id.
+
+name = "santas-list"
+compatibility_date = "2024-11-01"
+pages_build_output_dir = "public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "santas-list-db"
+# Placeholder — replace with your D1 database_id from `wrangler d1 create santas-list-db`
+database_id = "00000000-0000-0000-0000-000000000000"

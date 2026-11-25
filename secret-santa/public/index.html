@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a2a20" />
+  <meta name="description" content="Santa's List — Secret Santa gift preferences for the family." />
+  <title>Santa's List</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <!-- Soft snowfall atmosphere -->
+  <div class="snow" aria-hidden="true">
+    <span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span>
+  </div>
+
+  <main class="page">
+    <header class="brand">
+      <h1 class="brand__mark">Santa's List</h1>
+      <p class="brand__tag">Tell Santa what you love — your Secret Santa will thank you.</p>
+      <a class="nav-link" href="./profiles.html">View family profiles →</a>
+    </header>
+
+    <section class="panel panel--flush-bottom" aria-labelledby="form-heading">
+      <h2 id="form-heading" class="section-title">Your wishlist</h2>
+      <p class="section-lead">Pick your name and share a few gift clues. You can update anytime.</p>
+
+      <div id="error" class="error-banner" role="alert"></div>
+      <div id="success" class="success" role="status" aria-live="polite">
+        <strong>You're on the list!</strong>
+        Your wishlist was saved.
+        <a href="./profiles.html">See everyone's profiles</a>
+      </div>
+
+      <form id="intake-form" novalidate>
+        <!-- Editable family names: change the <option> list below (see README) -->
+        <div class="field">
+          <label for="name">Your name <span class="req" aria-hidden="true">*</span></label>
+          <select id="name" name="name" required>
+            <option value="" disabled selected>Select your name…</option>
+            <option value="Alex">Alex</option>
+            <option value="Jordan">Jordan</option>
+            <option value="Sam">Sam</option>
+            <option value="Taylor">Taylor</option>
+            <option value="Casey">Casey</option>
+            <option value="Morgan">Morgan</option>
+            <option value="Riley">Riley</option>
+            <option value="Avery">Avery</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <span class="field__label" id="interests-label">Interests</span>
+          <div class="interest-grid" role="group" aria-labelledby="interests-label">
+            <label class="interest"><input type="checkbox" name="interests" value="Cooking" /> Cooking</label>
+            <label class="interest"><input type="checkbox" name="interests" value="Sports" /> Sports</label>
+            <label class="interest"><input type="checkbox" name="interests" value="Books" /> Books</label>
+            <label class="interest"><input type="checkbox" name="interests" value="Tech" /> Tech</label>
+            <label class="interest"><input type="checkbox" name="interests" value="Outdoors" /> Outdoors</label>
+            <label class="interest"><input type="checkbox" name="interests" value="Music" /> Music</label>
+            <label class="interest"><input type="checkbox" name="interests" value="Art" /> Art</label>
+            <label class="interest"><input type="checkbox" name="interests" value="Fashion" /> Fashion</label>
+            <label class="interest"><input type="checkbox" name="interests" value="Home" /> Home</label>
+            <label class="interest"><input type="checkbox" name="interests" value="Games" /> Games</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="gift_ideas">Gift ideas</label>
+          <textarea id="gift_ideas" name="gift_ideas" placeholder="Specific items, brands, or wish-list links…"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="sizes">Sizes</label>
+          <input id="sizes" name="sizes" type="text" placeholder="Shirt, shoes, etc." autocomplete="off" />
+          <p class="hint">Anything a shopper should know (shirt M, shoe 10…).</p>
+        </div>
+
+        <div class="field">
+          <label for="favorite_stores">Favorite stores</label>
+          <input id="favorite_stores" name="favorite_stores" type="text" placeholder="Target, REI, local shops…" autocomplete="off" />
+        </div>
+
+        <div class="field">
+          <label for="avoid">Please avoid</label>
+          <textarea id="avoid" name="avoid" placeholder="Allergies, already-owned items, no-gos…"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="hobbies">Hobbies</label>
+          <textarea id="hobbies" name="hobbies" placeholder="What you spend free time on…"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="notes">Notes for your Santa</label>
+          <textarea id="notes" name="notes" placeholder="Anything else that helps…"></textarea>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <div class="submit-bar">
+    <button class="btn" type="submit" form="intake-form" id="submit-btn">Save to Santa's List</button>
+  </div>
+
+  <script>
+    (function () {
+      var form = document.getElementById("intake-form");
+      var btn = document.getElementById("submit-btn");
+      var success = document.getElementById("success");
+      var errorEl = document.getElementById("error");
+
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        success.classList.remove("is-visible");
+        errorEl.classList.remove("is-visible");
+        errorEl.textContent = "";
+
+        if (!form.name.value) {
+          errorEl.textContent = "Please select your name.";
+          errorEl.classList.add("is-visible");
+          form.name.focus();
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Saving…";
+
+        try {
+          var res = await fetch("/api/submit", {
+            method: "POST",
+            body: new FormData(form),
+          });
+          var data = await res.json().catch(function () {
+            return { success: false, error: "Unexpected response" };
+          });
+
+          if (!res.ok || !data.success) {
+            throw new Error(data.error || "Could not save. Try again.");
+          }
+
+          // Stay on page — show success near the top (above sticky submit bar)
+          success.classList.add("is-visible");
+          document.body.classList.add("form-saved");
+          success.scrollIntoView({ behavior: "smooth", block: "center" });
+        } catch (err) {
+          errorEl.textContent = err.message || "Something went wrong.";
+          errorEl.classList.add("is-visible");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Save to Santa's List";
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
