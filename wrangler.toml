@@ -1,0 +1,9 @@
+# Cloudflare Workers static site for jodez.me (keeper hub + root redirect).
+# Workers Builds service "jodez" reads this file at the repo root.
+# Santa's List lives under secret-santa/ with its own wrangler.toml (separate Pages project).
+
+name = "jodez"
+compatibility_date = "2024-11-01"
+
+[assets]
+directory = "."

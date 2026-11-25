@@ -40,7 +40,7 @@ Re-submitting the same name **updates** that profile (UPSERT).
    - Build output directory: `public`
 5. Bind the D1 database to the Pages project with binding name **`DB`** (same as `wrangler.toml`).
 
-> This folder is a sibling of `keeper/`. Do **not** point the whole-repo Pages project that serves `keeper/` at `secret-santa` unless you intend to switch which app is the site root — use a separate Pages project (or preview) with Root directory = `secret-santa`.
+> This folder is a sibling of `keeper/`. The repo-root Worker **`jodez`** (see root [`wrangler.toml`](../wrangler.toml)) serves the static site (`keeper/`, root redirect). Do **not** point that Worker’s root directory at `secret-santa` — use a **separate** Cloudflare Pages project with Root directory = `secret-santa` and D1 binding `DB`.
 
 ## Edit the name dropdown
 
