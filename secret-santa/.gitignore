@@ -1,0 +1,4 @@
+# Local wrangler / miniflare state — never commit
+.wrangler/
+.dev.vars
+node_modules/
