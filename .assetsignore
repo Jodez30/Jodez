@@ -1,0 +1,21 @@
+# Files excluded from the jodez Workers static assets upload.
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
+/_worker.js
+/_routes.json
+/functions
+node_modules
+.git
+.DS_Store
+.npmrc
+
+# Nested Santa's List Pages project — deploy via secret-santa/ Pages, not this Worker
+/secret-santa/.wrangler
+/secret-santa/functions
+/secret-santa/schema.sql
+/secret-santa/wrangler.toml
+/secret-santa/README.md
+/secret-santa/.gitignore

@@ -1,0 +1,11 @@
+# PREVIEW BRANCH ONLY — do not merge to main as-is.
+# Points the jodez Workers Build at Santa's List so the Cloudflare
+# branch preview opens the Secret Santa app (not the keeper redirect).
+# Mergeable app code stays on cursor/secret-santa-demo-04e8 → main.
+
+name = "jodez"
+compatibility_date = "2024-11-01"
+
+[assets]
+# Serve the Santa's List site root (form + profiles) on this preview branch
+directory = "secret-santa/public"

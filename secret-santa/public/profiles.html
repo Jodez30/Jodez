@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a2a20" />
+  <meta name="description" content="Family Secret Santa profiles on Santa's List." />
+  <title>Profiles — Santa's List</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="snow" aria-hidden="true">
+    <span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span>
+  </div>
+
+  <main class="page">
+    <header class="brand">
+      <h1 class="brand__mark">Santa's List</h1>
+      <p class="brand__tag">Family profiles for your Secret Santa draw.</p>
+      <a class="nav-link" href="./index.html">← Back to wishlist form</a>
+    </header>
+
+    <section class="panel" aria-labelledby="profiles-heading">
+      <div class="page-header-row">
+        <h2 id="profiles-heading" class="section-title">Profiles</h2>
+      </div>
+      <p class="section-lead">Tap a name to expand gift details.</p>
+
+      <div id="status" class="empty-state" aria-live="polite">Loading profiles…</div>
+      <ul id="profile-list" class="profile-list" hidden></ul>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var statusEl = document.getElementById("status");
+      var listEl = document.getElementById("profile-list");
+
+      var FIELDS = [
+        ["interests", "Interests"],
+        ["gift_ideas", "Gift ideas"],
+        ["sizes", "Sizes"],
+        ["favorite_stores", "Favorite stores"],
+        ["avoid", "Please avoid"],
+        ["hobbies", "Hobbies"],
+        ["notes", "Notes"],
+      ];
+
+      function escapeHtml(str) {
+        return String(str || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function renderProfiles(profiles) {
+        if (!profiles || profiles.length === 0) {
+          statusEl.innerHTML =
+            '<div class="empty-state">' +
+            "<p>No profiles yet. Be the first on Santa's List!</p>" +
+            '<a class="btn btn--ghost" href="./index.html">Fill out the form</a>' +
+            "</div>";
+          statusEl.hidden = false;
+          listEl.hidden = true;
+          return;
+        }
+
+        statusEl.hidden = true;
+        listEl.hidden = false;
+        listEl.innerHTML = profiles
+          .map(function (p) {
+            var rows = FIELDS.map(function (pair) {
+              var key = pair[0];
+              var label = pair[1];
+              var value = (p[key] || "").trim();
+              if (!value) return "";
+              return (
+                "<div><dt>" +
+                escapeHtml(label) +
+                "</dt><dd>" +
+                escapeHtml(value) +
+                "</dd></div>"
+              );
+            }).join("");
+
+            if (!rows) {
+              rows = "<div><dd>No details shared yet.</dd></div>";
+            }
+
+            return (
+              '<li class="profile-row">' +
+              "<details>" +
+              "<summary>" +
+              escapeHtml(p.name) +
+              "</summary>" +
+              '<div class="profile-detail"><dl>' +
+              rows +
+              "</dl></div>" +
+              "</details>" +
+              "</li>"
+            );
+          })
+          .join("");
+      }
+
+      fetch("/api/profiles")
+        .then(function (res) {
+          return res.json().then(function (data) {
+            if (!res.ok || !data.success) {
+              throw new Error(data.error || "Could not load profiles");
+            }
+            return data.profiles || [];
+          });
+        })
+        .then(renderProfiles)
+        .catch(function (err) {
+          statusEl.textContent = err.message || "Could not load profiles.";
+          statusEl.hidden = false;
+          listEl.hidden = true;
+        });
+    })();
+  </script>
+</body>
+</html>
